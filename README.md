@@ -1,2 +1,0 @@
-# angulargettingstarted
-Created with CodeSandbox

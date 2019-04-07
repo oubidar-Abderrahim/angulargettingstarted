@@ -1,6 +1,6 @@
 import { Component, OnInit } from "@angular/core";
 import { IProduct } from "./product";
-import { b } from "@angular/core/src/render3";
+import { ProductService } from "./product.service";
 
 @Component({
   selector: "pm-products",
@@ -12,6 +12,7 @@ export class ProductListComponent implements OnInit {
   imageWidth: number = 50;
   imageMargin: number = 2;
   showImage: boolean = false;
+  errorMsg: string;
 
   _listFilter: string;
   get listFilter(): string {
@@ -25,31 +26,9 @@ export class ProductListComponent implements OnInit {
   }
 
   filteredProduct: IProduct[];
-  products: IProduct[] = [
-    {
-      productId: 2,
-      productName: "Garden Cart",
-      productCode: "GDN-0023",
-      releaseDate: "March 18, 2016",
-      description: "15 Gallon capacity",
-      price: 32.99,
-      starRating: 4.2,
-      imageUrl: "https://openclipart.org/download/58471/garden-cart.svg"
-    },
-    {
-      productId: 5,
-      productName: "Hammer",
-      productCode: "TBX-0048",
-      releaseDate: "April 21, 2016",
-      description: "Curved claw steel hammer",
-      price: 8.99,
-      starRating: 4.8,
-      imageUrl: "https://openclipart.org/download/312585/1545752217.svg"
-    }
-  ];
+  products: IProduct[] = [];
 
-  constructor() {
-    this.filteredProduct = this.products;
+  constructor(private productService: ProductService) {
     this.listFilter = "";
   }
   toggleImage(): void {
@@ -58,6 +37,13 @@ export class ProductListComponent implements OnInit {
 
   ngOnInit(): void {
     // do something at init
+    this.productService.getProduct().subscribe(
+      products => {
+        this.products = products;
+        this.filteredProduct = this.products;
+      },
+      error => (this.errorMsg = <any>error)
+    );
   }
 
   performFilter(filterBy: string): IProduct[] {
@@ -66,9 +52,5 @@ export class ProductListComponent implements OnInit {
       (product: IProduct) =>
         product.productName.toLocaleLowerCase().indexOf(filterBy) !== -1
     );
-  }
-
-  onRatingClicked(message: string): void {
-    this.pageTitle = "Product List : " + message;
   }
 }
